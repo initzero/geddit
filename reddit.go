@@ -86,8 +86,10 @@ func main() {
 			var jRep geddit.Top
 			err = json.Unmarshal(body, &jRep)
 			geddit.CheckError(err)
+
+			icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :d-(^_^)z check your PMs for /r/" + e.Message[1:])
 			for _, str := range jRep.List() {
-				icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :" + str)
+				icon.SendRaw("PRIVMSG " + e.Nick + " :" + str)
 				time.Sleep(time.Second*1)
 			}		
 		}
