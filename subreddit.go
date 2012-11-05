@@ -4,6 +4,7 @@ import (
 	"log"
 	"encoding/json"
 	"strings"
+	"math"
 )
 
 // nullable string -- to handle json returning null. 
@@ -107,6 +108,31 @@ func (t Top) List() []string {
 	var ret []string
 	for _, child := range t.Data.Children {
 		ret = append(ret, string(child.Data.Title) + " " + string(child.Data.Url))
+	}
+	return ret
+}
+
+// format Top representation as IRC string(s)
+// TODO: make the color codes configurable
+func (t Top) ToIRCStrings() []string {
+	var ret []string
+	colorCodeA := "\x034,1"		// red on black
+	colorCodeB := "\x0312,1"	// blue on black
+	colorCodeC := "\x031,0"		// black on white
+	tmpColorCode := colorCodeA
+	var i float64 = 0.0
+
+	ret = append(ret, "\x033d-(^_^)z \x037 Loading reddit feed...")
+	for _, child := range t.Data.Children {
+		if math.Mod(i, 2) != 0 {
+			tmpColorCode = colorCodeA
+		} else {
+			tmpColorCode = colorCodeB
+		}
+		i += 1
+		// build return array
+		ret = append(ret, 
+			tmpColorCode + string(child.Data.Title) + "\x031,0 >> " + colorCodeC + string(child.Data.Url))
 	}
 	return ret
 }

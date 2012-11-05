@@ -36,13 +36,9 @@ func main() {
 	err := icon.Connect(os.Args[1])
 	geddit.CheckError(err)
 	icon.AddCallback("001", func(e *irc.IRCEvent) { icon.Join("#" + os.Args[2]) })
-	icon.AddCallback("JOIN", func(e *irc.IRCEvent) { 
-		icon.SendRaw("PRIVMSG #" + os.Args[2] + " :SCV ready s(^_^)-b")
-		//for _, str := range jRep.List() {		
-			//icon.SendRaw("PRIVMSG #geddit :" + str)
-		//	time.Sleep(time.Second*1) 
-		//}	
-	})
+	//icon.AddCallback("JOIN", func(e *irc.IRCEvent) { 
+		//icon.SendRaw("PRIVMSG #" + os.Args[2] + " :SCV ready s(^_^)-b")
+	//})
 	icon.AddCallback("PRIVMSG", func(e *irc.IRCEvent) {
 		if strings.HasPrefix(e.Message, "@reddit") {
 			req, err := http.NewRequest("GET", "http://reddit.com/r/" + e.Message[8:] + ".json", nil)
@@ -59,9 +55,10 @@ func main() {
 			// read response
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
-			//fmt.Printf("%s\n", string(body))
 			geddit.CheckError(err)
-	
+			
+			// hackish way of dealing with XML returned from reddit redirect caused 
+			// by subreddit not existing	
 			if strings.HasPrefix(string(body), "<") {
 				log.Println("returned xml; bad")
 				icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :ERROR // bad subreddit // q-(v_v)z")
@@ -72,13 +69,12 @@ func main() {
 			err = json.Unmarshal(body, &jRep)
 			geddit.CheckError(err)
 
-			icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :d-(^_^)z check your PMs for /r/" + e.Message[8:])
-			for _, str := range jRep.List() {
+			icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :\x031,9d-(^_^)z \x039,1check your PMs for /r/" + e.Message[8:])
+			for _, str := range jRep.ToIRCStrings() {
 				icon.SendRaw("PRIVMSG " + e.Nick + " :" + str)
 				time.Sleep(time.Second*1)
 			}		
 		}
-		
 	})
 	icon.Loop()
 }
