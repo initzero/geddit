@@ -82,7 +82,7 @@ func main() {
 			case <-ready:			
 				go sendIRC(jRep.ToIRCStrings(), icon, e, ready)
 			default:
-				icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :\x031,4q-(v_v)z \x034,1 wait ur turn (flood control, l0l ")
+				icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :\x031,4q-(v_v)z \x034,1 wait ur turn (flood control, l0l) ")
 			}	
 		}		
 	})
