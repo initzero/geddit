@@ -13,11 +13,11 @@ import (
 
 import (
 	geddit "github.com/initzero/geddit"
-	irc "github.com/thoj/Go-IRC-Client-Library"
+	irc "github.com/thoj/go-ircevent"
 )
 
 // send strings to IRC
-func sendIRC(s []string, i *irc.IRCConnection, e *irc.IRCEvent, ready chan bool) {
+func sendIRC(s []string, i *irc.Connection, e *irc.Event, ready chan bool) {
 	i.SendRaw("PRIVMSG " + e.Arguments[0] + " :\x031,9d-(^_^)z \x039,1 check your PMs for /r/" + e.Message[8:])
 	for _, str := range s {
 		i.SendRaw("PRIVMSG " + e.Nick + " :" + str)
@@ -42,12 +42,12 @@ func main() {
 	err := icon.Connect(os.Args[1])
 	geddit.CheckError(err)
 
-	icon.AddCallback("001", func(e *irc.IRCEvent) { icon.Join("#" + os.Args[2]) })
+	icon.AddCallback("001", func(e *irc.Event) { icon.Join("#" + os.Args[2]) })
 	//icon.AddCallback("JOIN", func(e *irc.IRCEvent) { 
 	//icon.SendRaw("PRIVMSG #" + os.Args[2] + " :SCV ready s(^_^)-b")
 	//})
 
-	icon.AddCallback("PRIVMSG", func(e *irc.IRCEvent) {
+	icon.AddCallback("PRIVMSG", func(e *irc.Event) {
 		if strings.HasPrefix(e.Message, "@reddit") {
 			// check for message longer than '@reddit sub'
 			if len(e.Message) < 8 {
@@ -88,6 +88,7 @@ func main() {
 			}
 		}
 		if strings.Contains(e.Message, "ur mom") {
+			time.Sleep(time.Second * 2)
 			icon.SendRaw("PRIVMSG " + e.Arguments[0] + " :\x031,4http://en.wikipedia.org/wiki/List_of_burn_centers_in_the_United_States")
 		}
 	})
